@@ -1,13 +1,50 @@
 <?php
 
+/**
+ * 
+ */
 class Cosino {
 
+    /**
+     *
+     * @var type 
+     */
     public $fieldsCount;
+    
+    /**
+     *
+     * @var type 
+     */
     public $chipCount;
+    
+    /**
+     *
+     * @var type 
+     */
     private $firstCombination = array();
+    
+    /**
+     *
+     * @var type 
+     */
     private $combination = array();
+    
+    /**
+     *
+     * @var type 
+     */
     private $countCombination = 0;
+    
+    /**
+     *
+     * @var type 
+     */
     public $bufferLimit = 5;
+    
+    /**
+     *
+     * @var type 
+     */
     private $file = false;
 
     public function __construct($fieldsCount = 0, $chipCount = 0) {
@@ -17,7 +54,11 @@ class Cosino {
         $this->_setFirstCombination();
         $this->_setCountCombination();
     }
-
+    
+    /**
+     * 
+     * @throws Exception
+     */
     private function _checkedFields() {
         if ($this->fieldsCount <= 0) {
             throw new Exception("fieldsCount должен быть больше нуля.");
@@ -27,7 +68,10 @@ class Cosino {
             throw new Exception("chipCount не может быть меньше fieldsCount.");
         }
     }
-
+    
+    /**
+     * 
+     */
     private function _setFirstCombination() {
         for ($i = 0; $i < $this->chipCount; $i++) {
             $this->firstCombination[] = 1;
@@ -37,19 +81,28 @@ class Cosino {
         }
     }
 
+    /**
+     * 
+     */
     private function _setCountCombination() {
         $n = $this->fieldsCount;
         $k = $this->chipCount;
         $t = 1;
 
-        for ($i = $n, $c = $n - ($k - 1); $i >= $c; $i--)
+        for ($i = $n, $c = $n - ($k - 1); $i >= $c; $i--) {
             $t *= $i;
-        for ($i = $k; $i >= 1; $i--)
+        }
+        for ($i = $k; $i >= 1; $i--) {
             $t /= $i;
+        }
 
         $this->countCombination = $t;
     }
 
+    /**
+     * 
+     * @return type
+     */
     private function _shiftLastOne() {
         $iOne = $this->_searchRightOne($this->combination['last']);
         $this->combination['last'][$iOne] = 0;
@@ -57,6 +110,9 @@ class Cosino {
         return $iOne + 1;
     }
 
+    /**
+     * 
+     */
     private function _AddOneAfterLastOne() {
         $lastCount = count($this->combination['last']) - 1;
         unset($this->combination['last'][$lastCount]);
@@ -74,23 +130,31 @@ class Cosino {
         }
     }
 
+    /**
+     * 
+     */
     private function _saveInFile() {
         $str = '';
         foreach ($this->combination['buffer'] as $buffer) {
-            if(is_array($buffer)){
+            if (is_array($buffer)) {
                 $str .= implode(' ', $buffer) . PHP_EOL;
-            }else{
+            } else {
                 $str .= $buffer;
             }
         }
-        if($this->file === false){
-            $this->file = dirname(__FILE__) . '/combination'.$this->fieldsCount.'_'.$this->chipCount.'_'.time().'.txt';
+        if ($this->file === false) {
+            $this->file = dirname(__FILE__) . '/combination' . $this->fieldsCount . '_' . $this->chipCount . '_' . time() . '.txt';
         }
         file_put_contents($this->file, $str, FILE_APPEND);
         @chmod($this->file, 0776);
         $this->combination['buffer'] = [];
     }
 
+    /**
+     * 
+     * @param type $array
+     * @return boolean
+     */
     private function _searchRightOne($array) {
         for ($i = count($array) - 1; $i >= 0; $i--) {
             if ($array[$i] == 1) {
@@ -101,6 +165,11 @@ class Cosino {
         return false;
     }
 
+    /**
+     * 
+     * @param type $limit
+     * @return type
+     */
     public function getAllCombination($limit = 1) {
         if ((int) $limit > 0) {
             $this->bufferLimit = (int) $limit;
@@ -130,4 +199,5 @@ class Cosino {
         }
         return $this->file;
     }
+
 }

@@ -1,50 +1,32 @@
 <?php
 
 /**
+ * Решение задачи про рулетку и монеты.
+ * @author  Egorov Maksim
  * 
+ * @property    integer $fieldsCount        Количество ячеек
+ * @property    integer $chipCount          Количество монет
+ * @property    array   $firstCombination   Первая комбинация
+ * @property    array   $combination        Массив содержащий буфер вывода, последнюю комбинацию и т.д.
+ * @property    integer $countCombination   Колличество возможных комбинаций
+ * @property    integer $bufferLimit        Максимальная длина буфера перед записью
+ * @property    string  $file               Путь к файлу вывода
  */
 class Cosino {
 
-    /**
-     *
-     * @var type 
-     */
+    
     public $fieldsCount;
     
-    /**
-     *
-     * @var type 
-     */
     public $chipCount;
     
-    /**
-     *
-     * @var type 
-     */
     private $firstCombination = array();
     
-    /**
-     *
-     * @var type 
-     */
     private $combination = array();
     
-    /**
-     *
-     * @var type 
-     */
     private $countCombination = 0;
     
-    /**
-     *
-     * @var type 
-     */
     public $bufferLimit = 5;
     
-    /**
-     *
-     * @var type 
-     */
     private $file = false;
 
     public function __construct($fieldsCount = 0, $chipCount = 0) {
@@ -56,7 +38,7 @@ class Cosino {
     }
     
     /**
-     * 
+     * Проверка входящих значений на корректность
      * @throws Exception
      */
     private function _checkedFields() {
@@ -70,7 +52,7 @@ class Cosino {
     }
     
     /**
-     * 
+     * Установка первой возможной комбинации
      */
     private function _setFirstCombination() {
         for ($i = 0; $i < $this->chipCount; $i++) {
@@ -82,7 +64,7 @@ class Cosino {
     }
 
     /**
-     * 
+     * Расчет и установка колличества возможных комбинаций
      */
     private function _setCountCombination() {
         $n = $this->fieldsCount;
@@ -100,8 +82,8 @@ class Cosino {
     }
 
     /**
-     * 
-     * @return type
+     * Сдвигаем последнюю единицу
+     * @return  integer  Номер позии передвинутой единицу
      */
     private function _shiftLastOne() {
         $iOne = $this->_searchRightOne($this->combination['last']);
@@ -111,7 +93,7 @@ class Cosino {
     }
 
     /**
-     * 
+     * Срезаем кранюю единицу и добавляем единицу после последней единицы
      */
     private function _AddOneAfterLastOne() {
         $lastCount = count($this->combination['last']) - 1;
@@ -131,7 +113,7 @@ class Cosino {
     }
 
     /**
-     * 
+     * Сохранение результата из буфера в файл
      */
     private function _saveInFile() {
         $str = '';
@@ -146,14 +128,14 @@ class Cosino {
             $this->file = dirname(__FILE__) . '/combination' . $this->fieldsCount . '_' . $this->chipCount . '_' . time() . '.txt';
         }
         file_put_contents($this->file, $str, FILE_APPEND);
-        @chmod($this->file, 0776);
+        @chmod($this->file, 0644);
         $this->combination['buffer'] = [];
     }
 
     /**
-     * 
-     * @param type $array
-     * @return boolean
+     * Поиск последней единицы в массиве
+     * @param   array   $array  Массив в котором искать
+     * @return  boolean|integer Номер позиции последней единицы или FALSE
      */
     private function _searchRightOne($array) {
         for ($i = count($array) - 1; $i >= 0; $i--) {
@@ -166,11 +148,11 @@ class Cosino {
     }
 
     /**
-     * 
-     * @param type $limit
-     * @return type
+     * Получает все возможные комбинации
+     * @param   integer $limit  Максимальное число комбинаций в буфере
+     * @return  string  Путь к созданному файлу
      */
-    public function getAllCombination($limit = 1) {
+    public function getAllCombination($limit = 0) {
         if ((int) $limit > 0) {
             $this->bufferLimit = (int) $limit;
         }
